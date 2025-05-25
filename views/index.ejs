@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Donation Drive</title>
+    <link rel="stylesheet" href="/style.css" />
+  </head>
+  <body>
+    <div class="container">
+      <h1>Donation Drive</h1>
+      <!-- Display the current total cash donation -->
+      <h2 id="cash">Total Cash Donation: $<span><%= cash %></span></h2>
+      <p>Give according to one's capacity;<br />Take according to one's need</p>
+      <div class="buttons">
+        <!-- Donate and Redeem buttons -->
+        <button id="donate" class="donate">Donate $10</button>
+        <button id="redeem" class="redeem">Redeem $10</button>
+      </div>
+      <!-- Area to display real-time messages -->
+      <div class="message" id="message"></div>
+      <div class="note">
+        <strong>
+          Pushing the blue button updates the cash by 10. The cash should be
+          updated on the server and displayed in REAL TIME. Pushing the red
+          button deducts the cash by 10.
+        </strong>
+      </div>
+    </div>
+    <!-- Load Socket.IO client library -->
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+      // Connect to the server via Socket.IO
+      const socket = io();
+      const cashEl = document.querySelector("#cash span");
+      const messageEl = document.getElementById("message");
+      // Emit 'donate' event when the donate button is clicked
+      document.getElementById("donate").onclick = () => {
+        socket.emit("donate");
+      };
+      // Emit 'redeem' event when the redeem button is clicked
+      document.getElementById("redeem").onclick = () => {
+        socket.emit("redeem");
+      };
+      // Listen for 'updateCash' events from the server to update UI in real time
+      socket.on("updateCash", ({ cash, message }) => {
+        cashEl.textContent = cash;
+        messageEl.textContent = message;
+      });
+    </script>
+  </body>
+</html>
